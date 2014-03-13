@@ -1,0 +1,173 @@
+@import "lib.less";
+
+.messenger {
+  display: none;
+  width: 500px;
+  padding: 3px;
+  border: 1px solid #ccc;
+
+  .conversation {
+    display: none;
+    margin-bottom: 2px;
+  }
+
+  .conversation-user {
+    white-space: nowrap;
+    overflow-x: hidden;
+    width: 100px;
+    float: left;
+  }
+
+  .conversation-message {
+    cursor: pointer;
+    margin-left: 100px;
+    background-color: #ccc;
+    padding: 2px;
+  }
+
+  .conversation-title {
+    font-weight: bold;
+  }
+
+
+  .tabs {
+    padding: 3px;
+    border: 1px solid #ccc;
+  }
+
+  .tabs-conversation {
+    cursor: pointer;
+    float: left;
+    margin: 2px;
+    width: 120px;
+    height: 20px;
+    padding: 2px;
+    background-color: #aaa;
+    color: #fff;
+  }
+
+  .tabs-conversation.active {
+    background-color: #ccc;
+  }
+
+  .tabs-name {
+    width: 100px;
+    white-space: nowrap;
+    overflow-x: hidden;
+    float: left;
+  }
+
+  .tabs-close {
+    width: 20px;
+    background-color: #eee;
+    color: #aaa;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+    float: right;
+  }
+
+  .conversations {
+    margin-top: 3px;
+    padding: 3px;
+    border: 1px solid #ccc;
+  }
+
+  .peers {
+    display: none;
+  }
+
+  .peers .item {
+    display: none;
+  }
+
+  .peer-messages {
+    border: 1px solid #000;
+    height: 200px;
+    padding: 2px;
+    margin-bottom: 3px;
+    overflow-y: scroll;
+  }
+  .peer-message.checked {
+    background-color: #eee;
+  }
+
+  .unread {
+    background-color: #ee4e22;
+    color: #fff;
+  }
+
+  .peer-message-user {
+    font-weight: bold;
+    color: #ccc;
+
+  }
+
+  .peer-textarea {
+    .boxing;
+    width: 100%;
+    display: block;
+    height: 50px;
+  }
+
+  .control-btn-conversations {
+    display: none;
+  }
+
+  .control-btn-peers {
+    display: none;
+  }
+
+  .last {
+    clear: both;
+  }
+
+  .new-message {
+    position: absolute;
+    z-index: 1;
+    top: 10px;
+    left: 10px;
+    background-color: #84c3ff;
+    padding: 10px;
+    border: 1px solid #000099;
+    padding-right: 20px;
+  }
+
+  textarea,input {
+    width: 100%;
+  }
+
+  .new-message-title {
+    width: 200px;
+  }
+
+  .new-message-body {
+    width: 200px;
+    textarea {
+      height: 100px;
+    }
+  }
+
+}
+
+
+.models-select-list {
+  border: 1px soid #fff;
+
+  .item {
+    float: left;
+    width: 100px;
+    border: 1px solid #fff;
+  }
+  .item-name {
+    float: left;
+    width: 80px;
+  }
+
+  .filter-list {
+    .boxing;
+    position: absolute;
+    background-color: #aaa;
+    width: 100%;
+  }
+}

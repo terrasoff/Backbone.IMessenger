@@ -162,6 +162,7 @@ AND t.idConversation = :idConversation'),
                     }
                 }
             } catch (CException $e) {
+                echo $e->getMessage();
                 $transaction->rollback();
             }
             $transaction->commit();

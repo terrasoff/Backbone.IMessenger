@@ -73,7 +73,6 @@ IMessenger.PeerView = Backbone.View.extend({
      */
     addMessage: function(message, collection, options)
     {
-        console.dir(options);
         if (options == undefined) options = {}
         if (options.history == undefined) options.history = false;
         history = options.history
@@ -83,7 +82,7 @@ IMessenger.PeerView = Backbone.View.extend({
         var process = history ? 'prepend' : 'append';
         this.$messages[process](item.$el);
 
-        var top = this.$messages.scrollTop() + item.$el.outerHeight(true)
+        var top = this.$messages.scrollTop() + item.$el.outerHeight(true);
         this.$messages.scrollTop(top);
     },
 

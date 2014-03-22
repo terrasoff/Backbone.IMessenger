@@ -70,6 +70,7 @@ IMessenger.Conversation = Backbone.Model.extend({
 
     addMessages: function(messages, history)
     {
+        var id = this.getId();
         if (history) {
             for(i=0;i<messages.length;i++) {
                 item = new IMessenger.Message(messages[i]);
@@ -80,7 +81,6 @@ IMessenger.Conversation = Backbone.Model.extend({
                 item = new IMessenger.Message(messages[i]);
                 this.messages.add(item, {history: history});
             };
-            this.trigger(IMessenger.Events.Conversation.UPDATE);
         }
         return this;
     },
@@ -112,43 +112,19 @@ IMessenger.Conversation = Backbone.Model.extend({
      * @returns {string}
      */
     setTitle: function() {
-        var receivers = this.receivers.filter(function(model) {
-            return model.getId() != this.user.getId();
+        var title = '';
+        this.receivers.each(function(model) {
+            if (model.getId() != this.user.getId()) {
+                title += model.attributes.name + ', ';
+            }
         }.bind(this));
 
-        var title = '';
-        for (var i=0; i<receivers.length; i++) {
-            title = receivers[i].get('name') + ', ';
-        }
-        this.title = title.trim('\\,\\s+');
+        this.title = title.replace(/,\s+$/,'');
         return this;
     },
 
     getTitle: function() {
     	return this.title;
-    },
-
-    /**
-     * Ищем сообщения с заданным идентификатором в разговоре
-     * @param list {Array} список идентификаторо сообщений
-     * @returns {Array}
-     */
-    getMessagesById: function(list) {
-        var i, j,message,idMessage;
-        var result = [];
-
-        var id;
-        var messages = this.getMessages();
-        for(i in list) {
-            message = messages.get(list[i]);
-            if (message) {
-                result.push(message);
-            }
-
-        }
-
-        return result;
-
     },
 
     select: function() {
@@ -165,10 +141,6 @@ IMessenger.Conversation = Backbone.Model.extend({
 
     getMessages: function() {
         return this.messages;
-    },
-
-    getLastMessage: function() {
-        return this.getMessages().last();
     },
 
     getId: function() {

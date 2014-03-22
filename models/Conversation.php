@@ -32,10 +32,11 @@ class Conversation extends IMActiveRecord
 
     public function relations()
     {
-        // NOTE: you may need to adjust the relation name and the related
-        // class name for the relations automatically generated below.
         return array(
-            'Message'=>array(self::MANY_MANY, 'Message', 'MessageConversation(idConversation, idMessage)'),
+            'Message'=>array(self::MANY_MANY, 'Message', 'MessageConversation(idConversation, idMessage)',
+                'with'=>'ReadMessage',
+                'together'=>true,
+            ),
             'Receiver'=>array(self::HAS_MANY, 'Receiver', 'idConversation'),
             'lastMessage' => array(self::MANY_MANY, 'Message', 'MessageConversation(idConversation, idMessage)',
                 'alias'=>'Message',
@@ -241,15 +242,18 @@ class Conversation extends IMActiveRecord
     }
 
     public function my(){
-        $this->getDbCriteria()->mergeWith(
+        $criteria = $this->getDbCriteria();
+        $criteria->mergeWith(
             array(
+                'select'=>'max(Message.idMessage) as maxMessageId',
                 'with'=>array('Receiver','Message'),
                 'together'=>true,
                 'condition'=>'Receiver.idUser = :idUser',
                 'params'=>array(':idUser'=>Yii::app()->user->getId()),
-                'order'=>'Message.idMessage DESC',
+                'group'=>'t.idconversation',
             )
         );
+        $criteria->order = 'maxMessageId DESC';
         return $this;
     }
 
@@ -262,11 +266,11 @@ class Conversation extends IMActiveRecord
         return $this;
     }
 
-    public function messages($limit=10, $sinceId=null, $maxId=null){
+    public function messages($limit=10, $sinceId=null, $maxId=null)
+    {
         $criteria =array(
-            'with'=>'Message',
+            'with'=>'Message:ordered',
             'limit'=>$limit,
-            'order'=>'Message.idMessage DESC',
         );
 
         if($maxId){
@@ -302,9 +306,25 @@ class Conversation extends IMActiveRecord
             }
         }
 
-        if(isset($with['messages'])){
+        if(isset($with['messages']))
+        {
             $data['messages'] = [];
-            $criteria = !empty($with['messages']) ? $with['messages'] : [];
+            $criteria = $with['messages'];
+
+            $params = array(
+                'order'=>'Message.idMessage DESC',
+                'limit'=>10,
+            );
+
+            if ($with['messages'] instanceof CDbCriteria) {
+                $criteria->mergeWith($params);
+            } else
+            if (is_array($with['messages'])) {
+                $criteria = array_merge($with['messages'], $params);
+            } else {
+                $criteria = $params;
+            }
+
             $messages = $this->getRelated('Message', false, $criteria);
             foreach ($messages as $message) {
                 $data['messages'][] = $message->toJSON();

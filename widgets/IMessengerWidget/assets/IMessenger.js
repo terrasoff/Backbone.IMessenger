@@ -90,6 +90,7 @@ IMessenger = function(params) {
 
         this.conversations.on('add',this.onAddConversation,this); // добавлен новый разговор
         this.conversations.on(IMessenger.Events.Conversation.NEW_MESSAGE,this.onNewMessage,this); // закрыли форму активного разговора
+        this.conversations.on(IMessenger.Events.Conversation.UP, this.moveConversationUp, this); // закрыли форму активного разговора
         this.conversations.on(IMessenger.Events.Message.SEND, this.sendMessage, this); // закрыли форму активного разговора
         this.conversations.on(IMessenger.Events.Peer.HISTORY, this.getHistory, this); // закрыли форму активного разговора
         this.conversations.on('change:active', this.onSelectConversation);
@@ -102,8 +103,7 @@ IMessenger = function(params) {
         }
 
         this.dispatcher = new IMessenger.Dispatcher({
-            server:this.server,
-            isActive: false
+            server:this.server
         });
         this.dispatcher.on(IMessenger.Events.Dispatcher.UPDATE,this.update);
         this.dispatcher.on(IMessenger.Events.Dispatcher.COMMAND,this.onCommand);
@@ -120,8 +120,6 @@ IMessenger = function(params) {
         $btn_new = $messenger.find('.control-btn-new');
         $new_messages = $messenger.find('.new-messages');
 
-        // обрабатываем запросы от автодополнений
-        this.on(BB.Autocomplete.Events.DATA,this.getAutocomplete,this);
         $btn_new.on('click',this.createNewMessage);
 
         this.sendCommand(new IMessenger.Command('conversations'));
@@ -178,7 +176,8 @@ IMessenger = function(params) {
     /**
      * Обновляем разговоры
      */
-    this.update = function() {
+    this.update = function()
+    {
         var command = new IMessenger.Command('update',{
             maxId: $this.getMaxId()
         });
@@ -222,18 +221,29 @@ IMessenger = function(params) {
         }.bind(this));
     };
 
+    this.updateMaxId = function(conversation) {
+        // т.к. сообщения упорядочены, то первое сообщение в первом разговоре будет иметь максимальный ID
+        if (conversation.data != undefined
+            && conversation.data.messages != undefined
+            && conversation.data.messages.length)
+        {
+            var maxId = conversation.data.messages[0].idMessage-0;
+            if (maxId > this.maxId)
+                this.maxId = maxId;
+        }
+    }
+
     /**
      * Пришли данные для обновления разговоров
      * @param conversations {Array}
      */
-    this.onUpdate = function(conversations) {
-        if (conversations.length) {
-            console.log("onUpdate");
-            // т.к. сообщения упорядочены, то первое сообщение в первом разговоре будет иметь максимальный ID
-            if (conversations[0].data != undefined
-                && conversations[0].data.messages != undefined
-                && conversations[0].data.messages.length)
-                this.maxId = conversations[0].data.messages[0].idMessage
+    this.onUpdate = function(conversations)
+    {
+        console.log("onUpdate");
+        if (conversations.length)
+        {
+            if (conversations[0] != undefined)
+                this.updateMaxId(conversations[0]);
 
             _.each(conversations, function(item) {
                 var conversation = this.conversations.get(item.attributes.idConversation);
@@ -241,9 +251,10 @@ IMessenger = function(params) {
                 // обновляем существующий разговор
                 if (conversation != undefined) {
                     conversation.addMessages(item.data.messages, false);
+                    conversation.trigger(IMessenger.Events.Conversation.UPDATE);
                 // создаем новый рзаговор
                 } else {
-                    this.createConversation(item);
+                    this.createConversation(item, {isNew: true});
                 }
             }.bind(this));
         }
@@ -310,31 +321,39 @@ IMessenger = function(params) {
      * Создаем новый разговор
      * @param data
      */
-    this.createConversation = function(data) {
+    this.createConversation = function(data, options) {
         data.data.user = this.user;
         var idConversation = data.attributes.idConversation;
         if (!this.conversations.get(idConversation)) {
+            if (options == undefined) options = {};
+            this.updateMaxId(data);
             var conversation = new IMessenger.Conversation(data.attributes, data.data);
-            //console.log("new conversation: "+conversation.getId()); console.dir(data);
-            this.conversations.add(conversation);
+            console.log("new conversation: "+conversation.getId()); console.dir(data);
+            this.conversations.add(conversation, options);
         }
         return this;
     }
-    
-    this.onAddConversation = function(conversation)
+
+    this.onAddConversation = function(conversation, options)
     {
-        this.addConversation(conversation);
+        console.log("on add conversation:"); console.dir(options);
+        this.addConversation(conversation, options);
     };
 
     /**
      * Добавляем форму очередного разговор в общий список разговоров
      * @param conversation {IMessenger.Conversation}
      */
-    this.addConversation = function(model)
+    this.addConversation = function(model, options)
     {
+        if (options == undefined) options = {};
 //        console.dir(conversation.getId());
+        console.log("add conversation");
+        console.dir(options);
         var conversation = new IMessenger.ConversationView({model: model});
-        $conversations.append(conversation.$el);
+        options.isNew != undefined
+            ? $conversations.prepend(conversation.$el)
+            : $conversations.append(conversation.$el);
 
         var peer = new IMessenger.PeerView({model: model});
         $peers.append(peer.$el);
@@ -392,6 +411,10 @@ IMessenger = function(params) {
         return Object.keys(this.peers).length;
     };
 
+    this.moveConversationUp = function($conversation) {
+        $conversations.prepend($conversation)
+    }
+
 
     this.render = function() {
         $el = $(this.form);
@@ -432,13 +455,15 @@ IMessenger.Events = {
         ADDED: 'conversation:added', // добавлен новый разговор
         SELECTED: 'conversation:selected', // выбрали разговор - открываем окно с активным разговором
         NEW_MESSAGE: 'conversation:message', // новое сообщение
-        UPDATE: 'conversation:update', // новое сообщение
+        UPDATE: 'IMessenger.Conversation.UPDATE', // разговор обновлен
+        UP: 'IMessenger.Conversation.UP', // нужно поднять разговор выше (т.к. обновлен)
         MAX_ID:'message:maxid' // идентификатор посл.полученного сообщения изменился
     },
     Peer: {
         HISTORY: 'IMessenger.Peer.HISTORY', // отправляем сообщение
         SEND: 'IMessenger.Peer.SEND', // отправляем сообщение
         SELECTED: 'peer:selected', // открыли активный разговор
+        UPDATE: 'IMessenger.Peer.UPDATE', // открыли активный разговор
         CLOSED: 'peer:closed' // закрыли активный разговор
     },
     Message: {

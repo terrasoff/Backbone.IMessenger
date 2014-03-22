@@ -72,7 +72,7 @@ class ReadMessage extends IMActiveRecord
     public function my()
     {
         $this->getDbCriteria()->mergeWith(array(
-            'condition'=>'read.idUser=:myself',
+            'condition'=>'ReadMessage.idUser=:myself',
             'params'=>array(':myself'=>Yii::app()->user->getId())
         ));
 

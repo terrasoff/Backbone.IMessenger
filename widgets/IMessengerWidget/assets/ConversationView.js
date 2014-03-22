@@ -13,6 +13,7 @@ IMessenger.ConversationView = Backbone.View.extend({
 
     initialize: function(params) {
         this.model.on('change:active', this.onChangeActive.bind(this));
+        this.model.on(IMessenger.Events.Conversation.UPDATE, this.onUpdate, this);
         return this.render();
     },
 
@@ -25,6 +26,10 @@ IMessenger.ConversationView = Backbone.View.extend({
         var state = this.model.get('active');
         this.$el.toggleClass('selected', state);
         return this;
+    },
+
+    onUpdate: function() {
+        this.model.trigger(IMessenger.Events.Conversation.UP, this.$el);
     },
 
     render: function() {

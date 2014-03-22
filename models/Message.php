@@ -36,8 +36,7 @@ class Message extends IMActiveRecord
             'author' => array(self::BELONGS_TO, 'User', 'idUser'),
             'reply_for' => array(self::BELONGS_TO, 'Message', 'replyIdMessage'),
             'conversations' => array(self::MANY_MANY, 'Conversation', 'MessageConversation(idMessage, idConversation)'),
-            'read' => array(
-                self::HAS_MANY, 'ReadMessage', 'idMessage',
+            'ReadMessage' => array(self::HAS_MANY, 'ReadMessage', 'idMessage',
                 'scopes'=>array('my')
             ),
             'ReplyMessage' => array(self::BELONGS_TO, 'Message', 'replyIdMessage'),
@@ -47,9 +46,11 @@ class Message extends IMActiveRecord
         );
     }
 
-    public function defaultScope() {
+    public function scopes(){
         return array(
-            'order'=>'Message.idMessage DESC',
+            'ordered'=>array(
+                'order'=>'Message.idMessage DESC',
+            ),
         );
     }
 
@@ -338,7 +339,7 @@ class Message extends IMActiveRecord
         $this->getDbCriteria()->mergeWith(array(
             'with'=>'read',
             // непрочитанные мной
-            'condition'=>'read.idMessage IS NULL',
+            'condition'=>'ReadMessage.idMessage IS NULL',
         ));
         return $this;
     }

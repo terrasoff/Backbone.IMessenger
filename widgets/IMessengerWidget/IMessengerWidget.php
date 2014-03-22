@@ -73,8 +73,6 @@ class IMessengerWidget extends CWidget
         $assetsPath2 = $am->getPublishedUrl($path2);
         $assetsPath3 = $am->getPublishedUrl($path3);
 
-        $cs->registerScriptFile($assetsPath1.'/TLib.js',CClientScript::POS_END);
-        $cs->registerScriptFile($assetsPath1.'/DynamicCollection.js',CClientScript::POS_END);
         $cs->registerScriptFile($assetsPath1.'/IMessenger.js',CClientScript::POS_END);
         $cs->registerScriptFile($assetsPath1.'/Receiver.js',CClientScript::POS_END);
         $cs->registerScriptFile($assetsPath1.'/Command.js',CClientScript::POS_END);
@@ -84,14 +82,6 @@ class IMessengerWidget extends CWidget
         $cs->registerScriptFile($assetsPath1.'/ConversationView.js',CClientScript::POS_END);
         $cs->registerScriptFile($assetsPath1.'/PeerView.js',CClientScript::POS_END);
         $cs->registerScriptFile($assetsPath1.'/PeerMessageView.js',CClientScript::POS_END);
-
-        $cs->registerScriptFile($assetsPath2.'/BB.Cache.js',CClientScript::POS_END);
-        $cs->registerScriptFile($assetsPath2.'/BB.Autocomplete.js',CClientScript::POS_END);
-        $cs->registerScriptFile($assetsPath2.'/BB.Autocomplete.ItemView.js',CClientScript::POS_END);
-
-        $cs->registerScriptFile($assetsPath3.'/BB.ModelsList.js',CClientScript::POS_END);
-        $cs->registerScriptFile($assetsPath3.'/BB.ModelsList.Model.js',CClientScript::POS_END);
-        $cs->registerScriptFile($assetsPath3.'/BB.ModelsList.ModelView.js',CClientScript::POS_END);
 
         // класс сообщений по-умолчанию
         $messenger = empty($this->classes['IMessenger'])

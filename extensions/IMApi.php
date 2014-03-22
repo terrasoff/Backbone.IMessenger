@@ -56,7 +56,9 @@ class IMApi extends Api {
         return false;
     }
 
-    public function conversations($data = null){
+    public function conversations($data = null)
+    {
+        $this->updating = false;
         $total = $this->bindParam('total',$data);
 
         try{
@@ -106,13 +108,13 @@ class IMApi extends Api {
         }
     }
 
-    public function update($data = null){
+    public function update($data = null)
+    {
         $idConversation = $this->bindParam('idConversation',$data);
         $maxId = $this->bindParam('maxId',$data);
         $sinceId = $this->bindParam('sinceId',$data);
 
         try{
-            $limit = 10;
             $criteria = new CDbCriteria();
 
             if($idConversation && is_int($idConversation)){
@@ -121,7 +123,7 @@ class IMApi extends Api {
             }
 
             $conversations = Conversation::model()
-                ->messages($limit,$sinceId,$maxId)
+                ->messages(10,$sinceId,$maxId)
                 ->my()
                 ->findAll($criteria);
             $result = [];

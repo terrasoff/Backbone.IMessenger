@@ -27,13 +27,13 @@ IMessenger.Dispatcher = function(params) {
     };
 
     this.dispatch = function() {
+        console.log("dispatch");
         $this.trigger(IMessenger.Events.Dispatcher.UPDATE);
     };
 
-    this.sendCommand = function(command) {
-        this.stop();
+    this.sendCommand = function(command)
+    {
         var $this = this;
-
         var data = command.toObject();
         if (command.getMaxId()) data.data.maxId = data.maxId;
         
@@ -90,7 +90,7 @@ IMessenger.Dispatcher = function(params) {
     this.reset = function() {
         if (this.isActive) {
             if (this.timer) clearTimeout(this.timer);
-            this.timer = setTimeout(this.dispatch,IMessenger.Dispatcher.PERIOD);
+            this.timer = setTimeout(this.dispatch, IMessenger.Dispatcher.PERIOD);
         }
     };
 

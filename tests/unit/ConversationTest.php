@@ -5,6 +5,9 @@
  * Date: 3/20/14 3:08 PM
  */
 
+
+const CONVERSATION_TOTAL = 5;
+
 class ConversationTest extends CDbTestCase
 {
     public $fixtures = array(

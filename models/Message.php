@@ -145,18 +145,16 @@ class Message extends IMActiveRecord
         $criteria->compare('idUser',$this->idUser);
         $criteria->compare('replyIdMessage',$this->replyIdMessage);
 
-        return new CActiveDataProvider($this, array(
-                                                   'criteria'=>$criteria,
-                                              ));
+        return new CActiveDataProvider($this, array('criteria'=>$criteria,));
     }
 
-    private function setMessageConversation(){
-        $messageConversation = new MessageConversation;
+    public  function setMessageConversation(){
+        $messageConversation = new MessageConversation();
 
         $messageConversation->idConversation = $this->idConversation;
         $messageConversation->idMessage = $this->idMessage;
 
-        return ($messageConversation->save()) ? true : false;
+        return $messageConversation->save();
 
     }
 
@@ -337,7 +335,7 @@ class Message extends IMActiveRecord
 
     public function unread(){
         $this->getDbCriteria()->mergeWith(array(
-            'with'=>'read',
+            'with'=>'ReadMessage',
             // непрочитанные мной
             'condition'=>'ReadMessage.idMessage IS NULL',
         ));

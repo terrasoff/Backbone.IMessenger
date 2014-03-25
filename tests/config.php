@@ -3,9 +3,9 @@
 return CMap::mergeArray(require(__DIR__.'/../../../config/test.php'), array(
 
     'import'=>array(
-        'im.tests.helpers.ImFixtureHelper',
-        'ext.webdriver-bindings.*',
-        'ext.webdriver-bindings.CWebDriverTestCase.phpwebdriver.*',
+        'im.tests.helpers.*',
+        'im.extensions.*',
+        'im.models.*',
     ),
 
     'components'=>array(

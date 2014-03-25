@@ -120,6 +120,8 @@ IMessenger.Conversation = Backbone.Model.extend({
         }.bind(this));
 
         this.title = title.replace(/,\s+$/,'');
+//        if (!this.title)
+            this.title = 'conversation'+this.getId();
         return this;
     },
 

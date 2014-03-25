@@ -117,6 +117,12 @@ class Conversation extends IMActiveRecord
         return new CActiveDataProvider($this, array('criteria'=>$criteria));
     }
 
+    public function __construct($appId = null, $type = 1) {
+        parent::__construct();
+        $this->appId = $appId ? $appId : ImModule::get()->appId;
+        $this->type = $type;
+    }
+
     public function addReceivers(array $userIds){
         $result = 0;
         $count_receivers = count($userIds);
@@ -142,7 +148,7 @@ class Conversation extends IMActiveRecord
             }
         }
 
-        return ($result == $count_receivers) ? true : false;
+        return $result == $count_receivers;
     }
 
     /**
@@ -269,8 +275,9 @@ class Conversation extends IMActiveRecord
     public function messages($limit=10, $sinceId=null, $maxId=null)
     {
         $criteria =array(
-            'with'=>'Message:ordered',
+            'with'=>'Message',
             'limit'=>$limit,
+            'order'=>'Message.idMessage DESC',
         );
 
         if($maxId){
@@ -325,7 +332,7 @@ class Conversation extends IMActiveRecord
                 $criteria = $params;
             }
 
-            $messages = $this->getRelated('Message', false, $criteria);
+            $messages = $this->getRelated('Message', true, $criteria);
             foreach ($messages as $message) {
                 $data['messages'][] = $message->toJSON();
             }

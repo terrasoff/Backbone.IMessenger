@@ -250,8 +250,10 @@ IMessenger = function(params) {
 
                 // обновляем существующий разговор
                 if (conversation != undefined) {
-                    conversation.addMessages(item.data.messages, false);
-                    conversation.trigger(IMessenger.Events.Conversation.UPDATE);
+                    if (item.data.messages.length) {
+                        conversation.addMessages(item.data.messages, false);
+                        conversation.trigger(IMessenger.Events.Conversation.UPDATE);
+                    }
                 // создаем новый рзаговор
                 } else {
                     this.createConversation(item, {isNew: true});
@@ -326,15 +328,15 @@ IMessenger = function(params) {
         var idConversation = data.attributes.idConversation;
         if (!this.conversations.get(idConversation)) {
             if (options == undefined) options = {};
-            this.updateMaxId(data);
             var conversation = new IMessenger.Conversation(data.attributes, data.data);
             console.log("new conversation: "+conversation.getId()); console.dir(data);
             this.conversations.add(conversation, options);
         }
+        this.updateMaxId(data);
         return this;
     }
 
-    this.onAddConversation = function(conversation, options)
+    this.onAddConversation = function(conversation, collection, options)
     {
         console.log("on add conversation:"); console.dir(options);
         this.addConversation(conversation, options);
@@ -348,8 +350,7 @@ IMessenger = function(params) {
     {
         if (options == undefined) options = {};
 //        console.dir(conversation.getId());
-        console.log("add conversation");
-        console.dir(options);
+        console.log("add conversation"); console.dir(options);
         var conversation = new IMessenger.ConversationView({model: model});
         options.isNew != undefined
             ? $conversations.prepend(conversation.$el)

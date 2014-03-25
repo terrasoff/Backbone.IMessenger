@@ -15,10 +15,22 @@ class WebTestCase extends EWebTestCase
 
 	protected function setUp()
 	{
-		parent::setUp();
+        $this->setBrowserUrl(TEST_BASE_URL);
+        parent::setUp();
 
         $host = WEBDRIVER_HOST;
-        $capabilities = array(WebDriverCapabilityType::BROWSER_NAME => 'firefox');
+        $capabilities = array(
+            WebDriverCapabilityType::BROWSER_NAME => 'firefox',
+            WebDriverCapabilityType::PLATFORM => 'LINUX',
+            WebDriverCapabilityType::VERSION => '3.6',
+            WebDriverCapabilityType::JAVASCRIPT_ENABLED => true,
+        );
         $this->driver = RemoteWebDriver::create($host, $capabilities, 5000);
-	}
+    }
+
+    protected function tearDown() {
+        if( $this->driver ) {
+            $this->driver->quit();
+        }
+    }
 }

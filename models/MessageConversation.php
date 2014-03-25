@@ -91,8 +91,6 @@ class MessageConversation extends IMActiveRecord
         $criteria->compare('idMessage',$this->idMessage);
         $criteria->compare('idConversation',$this->idConversation);
 
-        return new CActiveDataProvider($this, array(
-                                                   'criteria'=>$criteria,
-                                              ));
+        return new CActiveDataProvider($this, array('criteria'=>$criteria));
     }
 }
